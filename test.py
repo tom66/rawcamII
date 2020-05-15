@@ -11,7 +11,7 @@ rc = rawcam.init() # initializes camera interface, returns config object
 rawcam.set_data_lanes(2)
 rawcam.set_image_id(0x2a)
 rawcam.set_buffer_size(2048*128)
-rawcam.set_buffer_num(4)
+rawcam.set_buffer_num(8)
 rawcam.set_buffer_dimensions(2048, 128)
 rawcam.set_pack_mode(0)
 rawcam.set_unpack_mode(0)
@@ -44,6 +44,7 @@ while True: # FIXME
     for i in range(rawcam.buffer_count()):
         j+=1
         buf = rawcam.buffer_get()
+        #print(dir(buf))
         print ("got buf %s, len=%d, idx=%d" % (buf,len(buf),j))
 
         arr=numpy.frombuffer(buf,dtype='uint8') # yes this is zerocopy
@@ -55,3 +56,4 @@ while True: # FIXME
         # do other stuff with buffer contents
 
         rawcam.buffer_free(buf)
+        print("\n\n\n\n")

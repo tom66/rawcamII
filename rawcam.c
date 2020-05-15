@@ -72,6 +72,7 @@ enum teardown { NONE=0, PORT, POOL, C1, C2 };
 #define RAWCAM_VERSION 	"v0.0.1"
 
 int mmal_ret_status = 0;
+int fi_counter = 0;
 
 static void poke_efd(uint64_t u) {
 	//fprintf(stderr,"poking...");
@@ -118,20 +119,28 @@ void rawcam_stop (void) {
 
 static void callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer) {
 	//fprintf(stderr, "callback()\n");
-	
+	char fn_buffer[32];
+	sprintf(&fn_buffer, "rxtest_c/%d.bin", fi_counter++);
+	//FILE *fp = fopen(buffer, "wb");
+
 	assert (r.running);
 	if (!(buffer->flags&MMAL_BUFFER_HEADER_FLAG_CODECSIDEINFO)) {
-		//fprintf(stderr,"queueing buffer %p (data %p, len %d, flags %02x)\n", buffer, buffer->data, buffer->length, buffer->flags);
+		fprintf(stderr,"queueing buffer %p (data %p, len %d, flags %02x)\n", buffer, buffer->data, buffer->length, buffer->flags);
 		mmal_queue_put(r.queue, buffer);
+		FILE *fp = fopen(fn_buffer, "wb");
+		fwrite(buffer->data, buffer->length, 1, fp);
+		fclose(fp);
 		poke_efd (1);
 	} else {
 		rawcam_buffer_free(buffer);
 	}
+
+	//fclose(fp);
 }
 
 MMAL_BUFFER_HEADER_T *rawcam_buffer_get(void) {
 	MMAL_BUFFER_HEADER_T *buffer = mmal_queue_get(r.queue);
-	//fprintf(stderr,"dequeueing buffer %p (data %p, len %d)\n", buffer, buffer->data, buffer->length);
+	fprintf(stderr,"dequeueing buffer %p (data %p, len %d)\n", buffer, buffer->data, buffer->length);
 	return buffer;
 }
 
@@ -361,15 +370,15 @@ bool rawcam_start(void) {
 	TRY (mmal_port_parameter_set(r.output, &r.rx_cfg.hdr), C2);
 	TRY (mmal_port_parameter_set(r.output, &r.rx_timing.hdr), C2);
 	TRY (mmal_port_parameter_set_boolean(r.output, MMAL_PARAMETER_ZERO_COPY, r.zero_copy), C2);
+	r.output->format->es->video.crop.width = r.buffer_width;
+	r.output->format->es->video.crop.height = r.buffer_height;
+	r.output->format->es->video.width = VCOS_ALIGN_UP(r.buffer_width, 16);
+	r.output->format->es->video.height = VCOS_ALIGN_UP(r.buffer_height, 16);
 	TRY (mmal_port_format_commit(r.output), C2);
 
 	TRY (mmal_component_enable(r.rawcam), C2);
 	TRY (mmal_component_enable(r.isp), C2);
 	
-	r.output->format->es->video.crop.width = r.buffer_width;
-	r.output->format->es->video.crop.height = r.buffer_height;
-	r.output->format->es->video.width = VCOS_ALIGN_UP(r.buffer_width, 16);
-	r.output->format->es->video.height = VCOS_ALIGN_UP(r.buffer_height, 16);
 
         TRY (!(r.pool = mmal_port_pool_create(r.output, r.buffer_num, r.buffer_size)), C1);
 
