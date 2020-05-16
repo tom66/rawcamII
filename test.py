@@ -2,6 +2,7 @@
 import numpy
 import rawcam
 import random
+from hashlib import md5
 
 rc = rawcam.init() # initializes camera interface, returns config object
 #rc.pack = rawcam.Pack.NONE
@@ -16,7 +17,7 @@ rawcam.set_buffer_dimensions(2048, 128)
 rawcam.set_pack_mode(0)
 rawcam.set_unpack_mode(0)
 rawcam.set_unpack_mode(0)
-rawcam.set_encoding_fourcc(ord('G'), ord('R'), ord('G'), ord('B'))
+rawcam.set_encoding_fourcc(ord('G'), ord('R'), ord('B'), ord('G'))
 #rawcam.set_encode_block_length(32)
 #rawcam.set_embedded_data_lines(32)
 rawcam.set_zero_copy(1)
@@ -45,7 +46,7 @@ while True: # FIXME
         j+=1
         buf = rawcam.buffer_get()
         #print(dir(buf))
-        print ("got buf %s, len=%d, idx=%d" % (buf,len(buf),j))
+        print ("[%4d] got buf %s, len=%d, hash=%s" % (j,buf,len(buf),md5(buf).hexdigest()))
 
         arr=numpy.frombuffer(buf,dtype='uint8') # yes this is zerocopy
         #print ("average sample value %d" % (arr.sum()/len(arr)))
@@ -56,4 +57,3 @@ while True: # FIXME
         # do other stuff with buffer contents
 
         rawcam.buffer_free(buf)
-        print("\n\n\n\n")

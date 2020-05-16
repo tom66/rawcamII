@@ -4670,10 +4670,10 @@ SWIGINTERN PyObject *_wrap_buffer_free(PyObject *self, PyObject *args) {
   
   if (!PyArg_ParseTuple(args,(char *)"O:buffer_free",&obj0)) SWIG_fail;
   {
-    fprintf(stderr,"buf in %p\n",obj0);
+    //fprintf(stderr,"buf in %p\n",obj0);
     Py_buffer *buf=PyMemoryView_GET_BUFFER (obj0);
-    fprintf(stderr,"buf2 is %p\n", buf);
-    fprintf(stderr,"buf->internal is %p\n", buf->internal);
+    //fprintf(stderr,"buf2 is %p\n", buf);
+    //fprintf(stderr,"buf->internal is %p\n", buf->internal);
     arg1 = buf->internal;
   }
   rawcam_buffer_free(arg1);

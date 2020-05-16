@@ -118,29 +118,19 @@ void rawcam_stop (void) {
 }
 
 static void callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer) {
-	//fprintf(stderr, "callback()\n");
-	char fn_buffer[32];
-	sprintf(&fn_buffer, "rxtest_c/%d.bin", fi_counter++);
-	//FILE *fp = fopen(buffer, "wb");
-
 	assert (r.running);
 	if (!(buffer->flags&MMAL_BUFFER_HEADER_FLAG_CODECSIDEINFO)) {
-		fprintf(stderr,"queueing buffer %p (data %p, len %d, flags %02x)\n", buffer, buffer->data, buffer->length, buffer->flags);
+		//fprintf(stderr,"queueing buffer %p (data %p, len %d, flags %02x)\n", buffer, buffer->data, buffer->length, buffer->flags);
 		mmal_queue_put(r.queue, buffer);
-		FILE *fp = fopen(fn_buffer, "wb");
-		fwrite(buffer->data, buffer->length, 1, fp);
-		fclose(fp);
 		poke_efd (1);
 	} else {
 		rawcam_buffer_free(buffer);
 	}
-
-	//fclose(fp);
 }
 
 MMAL_BUFFER_HEADER_T *rawcam_buffer_get(void) {
 	MMAL_BUFFER_HEADER_T *buffer = mmal_queue_get(r.queue);
-	fprintf(stderr,"dequeueing buffer %p (data %p, len %d)\n", buffer, buffer->data, buffer->length);
+	//fprintf(stderr,"dequeueing buffer %p (data %p, len %d)\n", buffer, buffer->data, buffer->length);
 	return buffer;
 }
 
