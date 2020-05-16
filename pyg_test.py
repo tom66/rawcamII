@@ -61,36 +61,36 @@ while True: # FIXME
         #print(dir(buf))
         print ("[%4d] got buf %s, len=%d, hash=%s" % (j,buf,len(buf),md5(buf).hexdigest()))
 
-		"""
+        """
         arr=numpy.frombuffer(buf,dtype='uint8') # yes this is zerocopy
         #print ("average sample value %d" % (arr.sum()/len(arr)))
         #print(j)
         if (1):
                 open(("rxtest/%02d.bin" % j),"wb").write(buf)
-		"""
-		
+        """
+        
         # plot waveforms, this is probably -very- slow but I don't have a better way right now
-		pos = 0
-		for n in range(WAVES):
-			last_y = int(buf[xx_pos]) / WAVE_Y_SCALE
-			last_x = 0
-			
-			for x in range(1, WAVE_LENGTH):
-				this_y = int(buf[xx_pos]) / WAVE_Y_SCALE
-				xa_pos = int((xx_pos + x) / WAVE_X_SCALE)
-				print(((last_x, last_y), (xa_pos, this_y)))
-				
-				pygame.draw.line(window, (255, 255, 255), (last_x, last_y), (xa_pos, this_y))
-				
-				if xa_pos != last_x:
-					last_x = xa_pos
-			
-			xx_pos += WAVE_LENGTH
-		
+        pos = 0
+        for n in range(WAVES):
+            last_y = int(buf[xx_pos]) / WAVE_Y_SCALE
+            last_x = 0
+            
+            for x in range(1, WAVE_LENGTH):
+                this_y = int(buf[xx_pos]) / WAVE_Y_SCALE
+                xa_pos = int((xx_pos + x) / WAVE_X_SCALE)
+                print(((last_x, last_y), (xa_pos, this_y)))
+                
+                pygame.draw.line(window, (255, 255, 255), (last_x, last_y), (xa_pos, this_y))
+                
+                if xa_pos != last_x:
+                    last_x = xa_pos
+            
+            xx_pos += WAVE_LENGTH
+        
         rawcam.buffer_free(buf)
 
-	pygame.display.flip()
-	window.fill((0, 0, 0))
-	
-	time.sleep(0.05)
-	
+    pygame.display.flip()
+    window.fill((0, 0, 0))
+    
+    time.sleep(0.05)
+    
