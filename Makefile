@@ -10,6 +10,9 @@ rawcam_wrap.c: rawcam.i rawcam.c
 test:
 	$(PYTHON) test.py
 
+pyg_test:
+	$(PYTHON) pyg_test.py
+
 clean:
 	-rm -f *.so *.o rawcam_wrap.c
 
