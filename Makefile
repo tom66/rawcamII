@@ -1,4 +1,4 @@
-PYTHON ?= python3
+PYTHON ?= python3.8
 SWIG   ?= swig3.0
 
 build: rawcam_wrap.c rawcam.c rawcam.h
